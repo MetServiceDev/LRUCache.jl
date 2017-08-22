@@ -12,7 +12,7 @@ type LRU{K,V} <: Associative{K,V}
     q::LRUList{K, V}
     maxsize::Int
 
-    LRU(m::Int=__MAXCACHE__) = new(Dict{K, V}(), LRUList{K, V}(), m)
+    LRU{K,V}(m::Int=__MAXCACHE__) where {K,V} = new(Dict{K, V}(), LRUList{K, V}(), m)
 end
 LRU(m::Int=__MAXCACHE__) = LRU{Any, Any}(m)
 

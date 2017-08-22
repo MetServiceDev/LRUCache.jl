@@ -5,7 +5,7 @@ type LRUNode{K, V}
     prev::LRUNode{K, V}
 
     # All new created nodes are self referential only
-    function LRUNode{K, V}(k::K, v::V)
+    function LRUNode{K, V}(k::K, v::V) where {K,V}
         x = new(k, v)
         x.next = x
         x.prev = x
@@ -17,7 +17,7 @@ type LRUList{K, V}
     first::Nullable{LRUNode{K, V}}
     size::Int
 
-    LRUList() = new(Nullable{LRUNode{K, V}}(), 0)
+    LRUList{K,V}() where {K,V} = new(Nullable{LRUNode{K, V}}(), 0)
 end
 
 Base.first(l::LRUList) = !isempty(l) ? get(l.first) : error("LRUList is empty")
@@ -72,10 +72,10 @@ function Base.push!{K, V}(l::LRUList{K, V}, el::LRUNode{K, V})
 end
 
 function Base.pop!{K, V}(l::LRUList{K, V}, n::LRUNode{K, V}=last(l))
-    if is(n.next, n)
+    if n.next === n
         l.first = Nullable{LRUNode{K, V}}()
     else
-        if is(n, first(l))
+        if n === first(l)
             l.first = Nullable(n.next)
         end
         n.next.prev = n.prev
@@ -100,7 +100,7 @@ end
 
 # Move the node n to the front of the list
 function move_to_front!{T}(l::LRUList{T}, n::LRUNode{T})
-    if !is(first(l), n)
+    if !(first(l) === n)
         pop!(l, n)
         unshift!(l, n)
     end
